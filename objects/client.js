@@ -38,11 +38,11 @@ class Client extends Discord.Client {
     if (command) command.run(msg)
   }
 
-  pluginHandler (eventName, msg) {
+  pluginHandler (eventName, ...args) {
     this.plugins.forEach(plugin => {
       if (!plugin.events.includes(eventName)) return
       const methodName = `on${eventName.slice(0, 1).toUpperCase()}${eventName.substr(1)}`
-      plugin[methodName](msg)
+      plugin[methodName](...args)
     })
   }
 }
