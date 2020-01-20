@@ -5,10 +5,9 @@ class Ping extends Model {
     super(...args)
     this.alias = ['ping', 'pong', '핑', '퐁']
     this.name = 'ping'
-    this.events = ['message']
   }
 
-  message (msg) {
+  run (msg) {
     msg.channel.send(`${this.client.ping}ms`)
   }
 }

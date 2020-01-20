@@ -1,16 +1,25 @@
 const Discord = require('discord.js')
 const commands = require('../commands')
 const config = require('../config.json')
+const plugins = require('../plugins')
 
 class Client extends Discord.Client {
   constructor (config, ...args) {
     super(...args)
     this.config = config
-    this.commands = []
+    this.commands = new Map()
+    this.plugins = []
 
     commands.forEach(RawCMD => {
       const command = new RawCMD(this)
-      this.commands.push(command)
+      command.alias.forEach(alia => {
+        this.commands.set(alia, command)
+      })
+    })
+
+    plugins.forEach(RawPlugin => {
+      const plugin = new RawPlugin(this)
+      this.plugins.push(plugin)
     })
 
     this.on('ready', this.onReady)
@@ -22,18 +31,18 @@ class Client extends Discord.Client {
   }
 
   onMessage (msg) {
+    this.pluginHandler('message', msg)
     if (!msg.content.startsWith(config.prefix)) return
     msg.args = msg.content.replace(config.prefix, '').split(' ')
-    this.commands.forEach(command => {
-      if (command.events.includes('message')) {
-        if (!command.onlyWithCommand) {
-          command.message(msg)
-        } else {
-          if (command.alias.includes(msg.args[0])) {
-            command.message(msg)
-          }
-        }
-      }
+    const command = this.commands.get(msg.args[0])
+    if (command) command.run(msg)
+  }
+
+  pluginHandler (eventName, msg) {
+    this.plugins.forEach(plugin => {
+      if (!plugin.events.includes(eventName)) return
+      const methodName = `on${eventName.slice(0, 1).toUpperCase()}${eventName.substr(1)}`
+      plugin[methodName](msg)
     })
   }
 }

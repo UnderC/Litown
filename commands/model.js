@@ -4,12 +4,11 @@ class CommandModel {
     this.alias = []
     this.name = ''
     this.perm = []
-    this.events = []
     this.OwnerOnly = false
     this.onlyWithCommand = true
   }
 
-  message (msg) {}
+  run (msg) {}
 }
 
 module.exports = CommandModel
