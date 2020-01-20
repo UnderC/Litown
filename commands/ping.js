@@ -1,15 +1,14 @@
 const Model = require('./model')
-const config = {
-  alias: ['ping', 'pong', '핑', '퐁'],
-  name: 'ping'
-}
 
 class Ping extends Model {
-  constructor (client) {
-    super(client, config)
+  constructor (...args) {
+    super(...args)
+    this.alias = ['ping', 'pong', '핑', '퐁']
+    this.name = 'ping'
+    this.events = ['message']
   }
 
-  run (msg) {
+  message (msg) {
     msg.channel.send(`${this.client.ping}ms`)
   }
 }
